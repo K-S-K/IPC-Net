@@ -1,6 +1,10 @@
-# Creating the service.
-# The buidl command will be looking like this:
+# Using of the service.
 # 
+# Root: http://localhost:5237/
+# Doc:  http://localhost:5237/swagger
+# 
+# Creating of the service.
+# The buidl command will be looking like this:
 # docker build -t minimalapi:1.0 .
 
 

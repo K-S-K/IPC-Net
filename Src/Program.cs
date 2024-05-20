@@ -3,13 +3,38 @@ using NSwag.AspNetCore;
 
 internal class Program
 {
-    // RUN:  docker run minimalapi:1.0 -it ––name minimalapiapp ––p 5237:5237
-    // Doc:  http://localhost:5237/swagger
-    // Test: http://localhost:5237/
     private static void Main(string[] args)
     {
-        var builder = WebApplication.CreateBuilder(args);
+        WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+        ConfigureSwagger(builder);
+
+        WebApplication app = builder.Build();
+
+        if (app.Environment.IsDevelopment())
+        {
+            SubscribeToSwagger(app);
+        }
+
+        app.MapGet("/", RootPage);
+
+        app.Run();
+    }
+
+    private static void SubscribeToSwagger(WebApplication app)
+    {
+        app.UseOpenApi();
+        app.UseSwaggerUi(config =>
+        {
+            config.DocumentTitle = "IPC-Net API";
+            config.Path = "/swagger";
+            config.DocumentPath = "/swagger/{documentName}/swagger.json";
+            config.DocExpansion = "list";
+        });
+    }
+
+    private static void ConfigureSwagger(WebApplicationBuilder builder)
+    {
         /// Enables the API Explorer, 
         /// which is a service that provides metadata about the HTTP API. 
         /// The API Explorer is used by Swagger to generate the Swagger document.
@@ -26,23 +51,13 @@ internal class Program
             config.Title = "IPC-Net v1";
             config.Version = "v1";
         });
+    }
 
-        var app = builder.Build();
+    private static async Task RootPage(HttpResponse responce, HttpContext context)
+    {
+        context.Response.ContentType = "text/html; charset=UTF-8";
+        await context.Response.WriteAsync("Hello World!");
 
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseOpenApi();
-            app.UseSwaggerUi(config =>
-            {
-                config.DocumentTitle = "IPC-Net API";
-                config.Path = "/swagger";
-                config.DocumentPath = "/swagger/{documentName}/swagger.json";
-                config.DocExpansion = "list";
-            });
-        }
-
-        app.MapGet("/", () => "Hello World!");
-
-        app.Run();
+        Console.WriteLine("Root asked");
     }
 }
