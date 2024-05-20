@@ -1,0 +1,11 @@
+# Build results:
+Bin/
+
+# Intermediate files:
+obj/
+
+# Deployment directory:
+out/
+
+# Docker Storage:
+.DS_Store
